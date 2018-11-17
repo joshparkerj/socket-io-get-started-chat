@@ -34,6 +34,9 @@
         <script>
             $(function(){
                 const socket = io();
+                $('#m').change(() => {
+                    socket.emit('typing');
+                })
                 $('#messenger').submit(function(){
                     socket.emit('chat message',$('#m').val());
                     $('#messages').append($('<li>').text($('#m').val()));
@@ -47,7 +50,12 @@
                     return false;
                 })
                 socket.on('chat message',msg => {
-                    $('#messages').append($('<li>').text(msg));
+                    let message = JSON.parse(msg);
+                    $(`.${message.n}typing`).remove();
+                    $('#messages').append($('<li>').text(`${message.n}: ${message.m}`));
+                })
+                socket.on('typing message',n => {
+                    $('#messages').append($(`<li class="${n}typing">`).text(`${n} is typing...`));
                 })
             });
         </script>

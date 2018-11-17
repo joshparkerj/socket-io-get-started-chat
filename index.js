@@ -15,18 +15,22 @@ io.on('connection',socket => {
     socket.nickname = 'anonymous coward';
     socket.broadcast.emit('chat message',`${socket.nickname} connected`);
     console.log(`${socket.nickname} connected`);
-    socket.on('disconnect',() => {
-        io.emit('chat message',`${socket.nickname} disconnected`);
-        console.log(`${socket.nickname} disconnected`);
+    socket.on('typing',() => {
+        socket.broadcast.emit('typing message',socket.nickname);
+        console.log(`${socket.nickname} is typing...`)
     })
     socket.on('chat message',msg => {
-        socket.broadcast.emit('chat message',`${socket.nickname}: ${msg}`);
+        socket.broadcast.emit('chat message',JSON.stringify({n: socket.nickname, m: msg}));
         console.log(`${socket.nickname}: ${msg}`);
     })
     socket.on('change name',nickname => {
         socket.broadcast.emit('chat message',`${socket.nickname} changed name to: ${nickname}`);
         console.log(`${socket.nickname} changed name to: ${nickname}`);
         socket.nickname = nickname;
+    })
+    socket.on('disconnect',() => {
+        io.emit('chat message',`${socket.nickname} disconnected`);
+        console.log(`${socket.nickname} disconnected`);
     })
 })
 
