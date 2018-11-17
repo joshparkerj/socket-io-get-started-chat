@@ -4,6 +4,11 @@
     box-sizing: border-box;
 }
 
+li div {
+    display: inline-block;
+    margin: 8px;
+}
+
 body {
     font: 13px Helvetica, Arial;
 }

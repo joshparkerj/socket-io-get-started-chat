@@ -11,7 +11,6 @@ app.get('/index.css', (req, res) => {
 })
 
 io.on('connection', socket => {
-    // console.log(socket);
     socket.nickname = 'anonymous coward';
     socket.broadcast.emit('user connected', socket.nickname);
     console.log(`${socket.nickname} connected`);
@@ -22,6 +21,17 @@ io.on('connection', socket => {
     socket.on('chat message', msg => {
         socket.broadcast.emit('chat message', JSON.stringify({ n: socket.nickname, m: msg }));
         console.log(`${socket.nickname}: ${msg}`);
+    })
+    socket.on('private message',msg => {
+        let message = JSON.parse(msg);
+        io.clients((error, clients) => {
+            if (error) throw error;
+            console.log(clients);
+            let recipientId = clients.find(e => {
+                return io.clients.connected[e].nickname === message.n;
+            })
+            io.to(`${recipientId}`).emit('chat message',`Private: ${socket.nickname}: ${message.m}`);
+          });
     })
     socket.on('change name', nickname => {
         socket.broadcast.emit('name change', JSON.stringify({ old: socket.nickname, new: nickname }));
