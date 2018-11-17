@@ -1,6 +1,7 @@
 const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
+const connectedUsers = {};
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
@@ -22,20 +23,16 @@ io.on('connection', socket => {
         socket.broadcast.emit('chat message', JSON.stringify({ n: socket.nickname, m: msg }));
         console.log(`${socket.nickname}: ${msg}`);
     })
-    socket.on('private message',msg => {
+    socket.on('private message', msg => {
         let message = JSON.parse(msg);
-        io.clients((error, clients) => {
-            if (error) throw error;
-            console.log(clients);
-            let recipientId = clients.find(e => {
-                return io.clients.connected[e].nickname === message.n;
-            })
-            io.to(`${recipientId}`).emit('chat message',`Private: ${socket.nickname}: ${message.m}`);
-          });
+        connectedUsers[message.recipient].emit('private message', JSON.stringify({ n: socket.nickname, m: message.m }));
+        console.log(`To ${message.recipient}: Private: ${socket.nickname}: ${message.m}`);
+
     })
     socket.on('change name', nickname => {
         socket.broadcast.emit('name change', JSON.stringify({ old: socket.nickname, new: nickname }));
         console.log(`${socket.nickname} changed name to: ${nickname}`);
+        connectedUsers[nickname] = socket;
         socket.nickname = nickname;
     })
     socket.on('disconnect', () => {

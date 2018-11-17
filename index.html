@@ -38,6 +38,7 @@
     <script>
         $(function () {
             const socket = io();
+            let pm_recipient = '';
             $('#m').change(() => {
                 socket.emit('typing');
             })
@@ -53,15 +54,24 @@
                 $('#n').val('');
                 return false;
             })
+            $('#pm').submit(function () {
+                let msg = JSON.stringify({ recipient: pm_recipient, m: $('#p').val() });
+                socket.emit('private message', msg);
+                $('#p').val('');
+                return false;
+            })
             $('#online').click(event => {
-                console.log('clicked user');
-                console.log(event.target.id);
                 $('#pm button').text(`Send PM to ${event.target.id}`);
+                pm_recipient = event.target.id;
             })
             socket.on('chat message', msg => {
                 let message = JSON.parse(msg);
                 $(`.${message.n}typing`).remove();
                 $('#messages').append($('<li>').text(`${message.n}: ${message.m}`));
+            })
+            socket.on('private message', msg => {
+                let message = JSON.parse(msg);
+                $('#messages').append($('<li>').text(`Private: ${message.n}: ${message.m}`));
             })
             socket.on('typing message', n => {
                 $('#messages').append($(`<li class="${n}typing">`).text(`${n} is typing...`));
