@@ -8,12 +8,16 @@ body {
     font: 13px Helvetica, Arial;
 }
 
-form {
+.forms {
     background-color: black;
     padding: 3px;
     position: fixed;
     bottom: 0;
     width: 100%;
+}
+
+form {
+    margin: 5px;
 }
 
 input,button {

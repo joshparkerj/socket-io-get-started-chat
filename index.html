@@ -7,15 +7,24 @@
         <link rel="stylesheet" type="text/css" href="/index.css">
     </head>
     <body>
+        <h4 id="name-status"></h4>
         <ul id="messages">
 
         </ul>
-        <form action="">
-            <input id="m" autocomplete="off" />
-            <button>
-                Send
-            </button>
-        </form>
+        <div class="forms">
+            <form id="messenger" action="">
+                <input id="m" autocomplete="off" />
+                <button>
+                    Send message
+                </button>
+            </form>
+            <form id="nickname" action="">
+                <input id="n" />
+                <button>
+                    Change nickname
+                </button>
+            </form>
+        </div>
         <script src="/socket.io/socket.io.js">
         
         </script>
@@ -25,11 +34,17 @@
         <script>
             $(function(){
                 const socket = io();
-                $('form').submit(function(){
+                $('#messenger').submit(function(){
                     socket.emit('chat message',$('#m').val());
                     $('#m').val('');
                     return false;
                 });
+                $('#nickname').submit(function(){
+                    socket.emit('change name',$('#n').val());
+                    $('#name-status').text(`Logged in as ${$('#n').val()}`);
+                    $('#n').val('');
+                    return false;
+                })
                 socket.on('chat message',msg => {
                     $('#messages').append($('<li>').text(msg));
                 })

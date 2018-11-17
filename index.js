@@ -11,15 +11,22 @@ app.get('/index.css', (req,res) => {
 })
 
 io.on('connection',socket => {
-    console.log('a user connected');
-    io.emit('chat message','a user connected');
+    // console.log(socket);
+    socket.nickname = 'anonymous coward';
+    io.emit('chat message',`${socket.nickname} connected`);
+    console.log(`${socket.nickname} connected`);
     socket.on('disconnect',() => {
-        console.log('user disconnected');
-        io.emit('chat message','user disconnected');
+        io.emit('chat message',`${socket.nickname} disconnected`);
+        console.log(`${socket.nickname} disconnected`);
     })
     socket.on('chat message',msg => {
-        console.log(`message: ${msg}`);
-        io.emit('chat message',msg);
+        io.emit('chat message',`${socket.nickname}: ${msg}`);
+        console.log(`${socket.nickname}: ${msg}`);
+    })
+    socket.on('change name',nickname => {
+        io.emit('chat message',`${socket.nickname} changed name to: ${nickname}`);
+        console.log(`${socket.nickname} changed name to: ${nickname}`);
+        socket.nickname = nickname;
     })
 })
 
