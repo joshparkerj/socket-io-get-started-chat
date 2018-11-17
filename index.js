@@ -13,7 +13,7 @@ app.get('/index.css', (req,res) => {
 io.on('connection',socket => {
     // console.log(socket);
     socket.nickname = 'anonymous coward';
-    socket.broadcast.emit('chat message',`${socket.nickname} connected`);
+    socket.broadcast.emit('user connected',socket.nickname);
     console.log(`${socket.nickname} connected`);
     socket.on('typing',() => {
         socket.broadcast.emit('typing message',socket.nickname);
@@ -24,12 +24,12 @@ io.on('connection',socket => {
         console.log(`${socket.nickname}: ${msg}`);
     })
     socket.on('change name',nickname => {
-        socket.broadcast.emit('chat message',`${socket.nickname} changed name to: ${nickname}`);
+        socket.broadcast.emit('name change',JSON.stringify({old: socket.nickname, new: nickname}));
         console.log(`${socket.nickname} changed name to: ${nickname}`);
         socket.nickname = nickname;
     })
     socket.on('disconnect',() => {
-        io.emit('chat message',`${socket.nickname} disconnected`);
+        io.emit('user disconnected',socket.nickname);
         console.log(`${socket.nickname} disconnected`);
     })
 })
