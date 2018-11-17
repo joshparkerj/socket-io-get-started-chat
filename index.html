@@ -1,80 +1,83 @@
 <!doctype html>
 <html>
-    <head>
-        <title>
-            Socket.IO chat
-        </title>
-        <link rel="stylesheet" type="text/css" href="/index.css">
-    </head>
-    <body>
-        <h4 id="name-status"></h4>
-        <h4>Online Users: </h4>
-        <ul id="online"></ul>
-        <ul id="messages">
 
-        </ul>
-        <div class="forms">
-            <form id="messenger" action="">
-                <input id="m" autocomplete="off" />
-                <button>
-                    Send message
-                </button>
-            </form>
-            <form id="nickname" action="">
-                <input id="n" />
-                <button>
-                    Change nickname
-                </button>
-            </form>
-        </div>
-        <script src="/socket.io/socket.io.js">
-        
-        </script>
-        <script src="https://code.jquery.com/jquery-1.11.1.js">
-        
-        </script>
-        <script>
-            $(function(){
-                const socket = io();
-                $('#m').change(() => {
-                    socket.emit('typing');
-                })
-                $('#messenger').submit(function(){
-                    socket.emit('chat message',$('#m').val());
-                    $('#messages').append($('<li>').text($('#m').val()));
-                    $('#m').val('');
-                    return false;
-                });
-                $('#nickname').submit(function(){
-                    socket.emit('change name',$('#n').val());
-                    $('#name-status').text(`Logged in as ${$('#n').val()}`);
-                    $('#n').val('');
-                    return false;
-                })
-                socket.on('chat message',msg => {
-                    let message = JSON.parse(msg);
-                    $(`.${message.n}typing`).remove();
-                    $('#messages').append($('<li>').text(`${message.n}: ${message.m}`));
-                })
-                socket.on('typing message',n => {
-                    $('#messages').append($(`<li class="${n}typing">`).text(`${n} is typing...`));
-                })
-                socket.on('user connected',n => {
-                    // console.log('user connected');
-                    // console.log(n);
-                    // $('#online-users').append(`<li class="${n}online>${n}</li>"`);
-                    $('#messages').append($('<li>').text(`${n} connected`));
-                })
-                socket.on('name change', names => {
-                    let n = JSON.parse(names);
-                    $('#online').append(`<li class="${n.new}online">${n.new}</li>`);
-                    $('#messages').append($('<li>').text(`${n.old} changed name to: ${n.new}`));
-                })
-                socket.on('user disconnected',n => {
-                    $(`.${n}online`).remove();
-                    $('#messages').append($('<li>').text(`${n} disconnected`));
-                })
+<head>
+    <title>
+        Socket.IO chat
+    </title>
+    <link rel="stylesheet" type="text/css" href="/index.css">
+</head>
+
+<body>
+    <h4 id="name-status"></h4>
+    <h4>Online Users: </h4>
+    <ul id="online"></ul>
+    <ul id="messages">
+
+    </ul>
+    <div class="forms">
+        <form id="messenger" action="">
+            <input id="m" autocomplete="off" />
+            <button>
+                Send message
+            </button>
+        </form>
+        <form id="nickname" action="">
+            <input id="n" />
+            <button>
+                Change nickname
+            </button>
+        </form>
+    </div>
+    <script src="/socket.io/socket.io.js">
+
+    </script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js">
+
+    </script>
+    <script>
+        $(function () {
+            const socket = io();
+            $('#m').change(() => {
+                socket.emit('typing');
+            })
+            $('#messenger').submit(function () {
+                socket.emit('chat message', $('#m').val());
+                $('#messages').append($('<li>').text($('#m').val()));
+                $('#m').val('');
+                return false;
             });
-        </script>
-    </body>
+            $('#nickname').submit(function () {
+                socket.emit('change name', $('#n').val());
+                $('#name-status').text(`Logged in as ${$('#n').val()}`);
+                $('#n').val('');
+                return false;
+            })
+            socket.on('chat message', msg => {
+                let message = JSON.parse(msg);
+                $(`.${message.n}typing`).remove();
+                $('#messages').append($('<li>').text(`${message.n}: ${message.m}`));
+            })
+            socket.on('typing message', n => {
+                $('#messages').append($(`<li class="${n}typing">`).text(`${n} is typing...`));
+            })
+            socket.on('user connected', n => {
+                // console.log('user connected');
+                // console.log(n);
+                // $('#online-users').append(`<li class="${n}online>${n}</li>"`);
+                $('#messages').append($('<li>').text(`${n} connected`));
+            })
+            socket.on('name change', names => {
+                let n = JSON.parse(names);
+                $('#online').append(`<li class="${n.new}online">${n.new}</li>`);
+                $('#messages').append($('<li>').text(`${n.old} changed name to: ${n.new}`));
+            })
+            socket.on('user disconnected', n => {
+                $(`.${n}online`).remove();
+                $('#messages').append($('<li>').text(`${n} disconnected`));
+            })
+        });
+    </script>
+</body>
+
 </html>
