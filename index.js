@@ -11,6 +11,10 @@ app.get('/index.css', (req, res) => {
     res.sendFile(__dirname + '/index.css');
 })
 
+app.get('/favicon.ico',(req,res) => {
+  res.sendFile(__dirname + '/favicon.ico');
+})
+
 io.on('connection', socket => {
     socket.nickname = 'anonymous coward';
     socket.broadcast.emit('user connected', socket.nickname);
@@ -41,4 +45,4 @@ io.on('connection', socket => {
     })
 })
 
-http.listen(8080);
+http.listen(process.env.PORT || 8080);
